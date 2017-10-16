@@ -2,7 +2,7 @@ package snake;
 import snake.Snake;
 
 /**
- * A SnakePlayer is a snake controlled by a player.
+ * A snake controlled by a player.
  * @author Guilherme Recchi Cardozo
  */
 class SnakePlayer extends Snake 

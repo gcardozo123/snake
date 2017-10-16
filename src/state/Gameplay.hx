@@ -1,10 +1,11 @@
 package state;
 import flash.Lib;
-import snake.Snake;
 import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;
 import haxe.Timer;
+import snake.Snake;
 import snake.SnakePlayer;
+import utils.Destroy;
 
 /**
  * The state where the gameplay happens.
@@ -12,35 +13,40 @@ import snake.SnakePlayer;
  */
 class Gameplay extends GameState 
 {
+	private var gameOverCallback:Void -> Void;
 	private var tilemap:Tilemap;
 	private var snakeOne:SnakePlayer;
 	private var snakeTwo:SnakePlayer;
+	private var timer:Timer;
 	private var turn:UInt;
 	/**
 	 * Binds keyboard keys to players.
 	 */
 	private var keyPlayer:Map<UInt, SnakePlayer>;
 	
-	public function new(key:String) 
+	public function new(key:String, gameOverCallback:Void -> Void) 
 	{
 		super(key);	
+		this.gameOverCallback = gameOverCallback;
 	}
 	
 	override public function init():Void
 	{
 		turn = 0;
-		tilemap = new Tilemap(54, 30, 18, 18);
+		var tileWidth = 18;
+		var tileHeight = 18;
+		tilemap = new Tilemap(54, 30, tileWidth, tileHeight);
 		tilemap.x = (Lib.current.stage.stageWidth - tilemap.width) * 0.5;
 		tilemap.y = (Lib.current.stage.stageHeight - tilemap.height) * 0.5;
 		addChild(tilemap);
 		
-		snakeOne = new SnakePlayer(0, 0x005e12, 2, 5, Direction.RIGHT, 54, 30, 18, 18);
-		snakeTwo = new SnakePlayer(1, 0xa09e26, tilemap.numCols - 3, 4, Direction.LEFT, 54, 30, 18, 18);
+		snakeOne = new SnakePlayer(0, 0x005e12, 2, 5, Direction.RIGHT, 54, 30, tileWidth, tileHeight);
+		snakeTwo = new SnakePlayer(1, 0xa09e26, tilemap.numCols - 3, 4, Direction.LEFT, 54, 30, tileWidth, tileHeight);
 		tilemap.addSnake(snakeOne);
 		tilemap.addSnake(snakeTwo);
 		setupInputHandler();
 		
-		var timer = new Timer(100); //500ms delay
+		timer = new Timer(200); //200ms delay
 		timer.run = newTurn; 
 	}
 	
@@ -57,6 +63,9 @@ class Gameplay extends GameState
 		
 		tilemap.checkCollisions();
 		turn++;
+		
+		if (!snakeOne.isAlive && !snakeTwo.isAlive && gameOverCallback != null)
+			gameOverCallback();
 	}
 	
 	private function setupInputHandler():Void
@@ -90,5 +99,13 @@ class Gameplay extends GameState
 	override public function destroy():Void
 	{
 		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		if (timer != null)
+		{
+			timer.stop();
+			timer = null;
+		}
+		tilemap = Destroy.object(tilemap);
+		snakeOne = Destroy.object(snakeOne);
+		snakeTwo = Destroy.object(snakeTwo);
 	}
 }

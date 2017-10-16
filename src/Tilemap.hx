@@ -4,6 +4,7 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.geom.Point;
+import interfaces.IDestructible;
 import snake.Snake;
 import utils.Destroy;
 import utils.Draw;
@@ -12,7 +13,7 @@ import utils.Draw;
  * Represents the tilemap where the snakes chase apples.
  * @author Guilherme Recchi Cardozo
  */
-class Tilemap extends Sprite 
+class Tilemap extends Sprite implements IDestructible
 {
 	public var numCols(default, null):Int;
 	public var numRows(default, null):Int;
@@ -21,7 +22,7 @@ class Tilemap extends Sprite
 	private var tileHeight:Float;
 	private var backgroundWidth:Float;
 	private var backgroundHeight:Float;
-	private var snakes:Array<snake.Snake>;
+	private var snakes:Array<Snake>;
 	private var apple:Bitmap;
 	/**
 	 * The index of the tilemap corresponding to the apple position.
@@ -238,5 +239,15 @@ class Tilemap extends Sprite
 	{
 		var head:Point = snake.getPositions()[0];
 		return head.x == applePosition.x && head.y == applePosition.y;
+	}
+	
+	public function destroy():Void
+	{
+		if (snakes != null)
+			snakes.splice(0, snakes.length);
+		if (apple != null)
+			apple = Destroy.bitmap(apple);
+		
+		//graphics.clear(); //I commented this line so you won't stare at a blank screen when the game ends.
 	}
 }

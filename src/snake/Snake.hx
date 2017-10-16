@@ -29,7 +29,6 @@ class Snake extends Sprite implements IDestructible
 	private var startY:Int;
 	private var currentDirection:Direction;
 	private var lastChangeDirection:UInt;
-	
 	/**
 	 * The array of segments of the snake.
 	 */
@@ -232,7 +231,10 @@ class Snake extends Sprite implements IDestructible
 	
 	public function destroy():Void
 	{
+		if (segmentPositions != null)
+			segmentPositions.splice(0, segmentPositions.length);
 		
+		segments = Destroy.bitmapArray(segments);
 	}
 }
 

@@ -28,7 +28,12 @@ class Game extends Sprite
 	private function init():Void
 	{
 		Game.stateManager = new state.StateManager(this);
-		gameplay = new Gameplay("Gameplay");
+		gameplay = new Gameplay("Gameplay", onGameOver);
 		Game.stateManager.add(gameplay, true);
+	}
+	
+	private function onGameOver():Void
+	{
+		Game.stateManager.destroy();
 	}
 }

@@ -5,12 +5,10 @@ import flash.display.StageScaleMode;
 import flash.Lib;
 
 /**
- * ...
  * @author Guilherme Recchi Cardozo
  */
 class Main 
 {
-	
 	static function main() 
 	{
 		var stage = Lib.current.stage;

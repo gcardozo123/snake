@@ -1,5 +1,5 @@
-package;
-import gameStates.GameState;
+package state;
+import state.GameState;
 import interfaces.IDestructible;
 
 /**

@@ -1,4 +1,4 @@
-package gameStates;
+package state;
 
 import flash.display.Sprite;
 import interfaces.IDestructible;

@@ -1,9 +1,10 @@
-package;
+package snake;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.geom.Point;
+import interfaces.IDestructible;
 import utils.Destroy;
 import utils.Draw;
 
@@ -11,14 +12,14 @@ import utils.Draw;
  * Represents the Snake.
  * @author Guilherme Recchi Cardozo
  */
-class Snake extends Sprite 
+class Snake extends Sprite implements IDestructible
 {
 	/**
 	 * Unique identifier that differentiates snakes.
 	 */
 	public var ID(default, null):UInt;
+	public var isAlive(default, set):Bool;
 
-	private var isAlive(default, set):Bool;
 	private var color:UInt;
 	private var mapNumRows:Int;
 	private var mapNumCols:Int;
@@ -27,6 +28,7 @@ class Snake extends Sprite
 	private var startX:Int;
 	private var startY:Int;
 	private var currentDirection:Direction;
+	private var lastChangeDirection:UInt;
 	
 	/**
 	 * The array of segments of the snake.
@@ -58,6 +60,7 @@ class Snake extends Sprite
 		this.mapNumCols = mapNumCols;
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
+		lastChangeDirection = 0;
 		spawn(startX, startY, startDir);
 	}
 	
@@ -107,7 +110,7 @@ class Snake extends Sprite
 		if (segments != null)
 			segments = Destroy.bitmapArray(segments);	
 		
-		var bmpd = new BitmapData(18, 18, false, color);	
+		var bmpd = new BitmapData(Std.int(tileWidth), Std.int(tileHeight), false, color);	
 		segments = [new Bitmap(bmpd.clone()), new Bitmap(bmpd.clone()), new Bitmap(bmpd.clone())];
 		
 		for (i in 0 ... segments.length)
@@ -165,11 +168,36 @@ class Snake extends Sprite
 	
 	private function set_isAlive(value:Bool):Bool
 	{
+		if (!value)
+			visible = false;
 		return isAlive = value;
+	}
+	
+	/**
+	 * Changes the current direction of the snake.
+	 * @param	newDir The new direction.
+	 * @param   turn The turn when key was pressed.
+	 */
+	public function changeDirection(newDir:Direction, turn:UInt):Void
+	{
+		if (lastChangeDirection == turn) 
+			return; //Can't change direction multiple times in the same turn.
+		
+		if (newDir == currentDirection || newDir == getOppositeDirection(currentDirection))
+			return;
+		
+		lastChangeDirection = turn;
+		currentDirection = newDir;
 	}
 	
 	public function update():Void
 	{
+		if (!isAlive)
+		{
+			visible = false;
+			return;
+		}
+		
 		//Removes the tail of the snake and puts on the next Snake position (in front of its head).
 		var newHead = segmentPositions.pop();
 		getNextPosition(segmentPositions[0], currentDirection, newHead);
@@ -179,6 +207,32 @@ class Snake extends Sprite
 		newHeadBmp.x = tileWidth * newHead.x;
 		newHeadBmp.y = tileHeight * newHead.y;
 		segments.unshift(newHeadBmp);
+	}
+	
+	public function grow():Void
+	{
+		var newHead = new Point();
+		getNextPosition(segmentPositions[0], currentDirection, newHead);
+		segmentPositions.unshift(newHead);
+		
+		var newHeadBmp:Bitmap = new Bitmap(new BitmapData(Std.int(tileWidth), Std.int(tileHeight), false, color));
+		newHeadBmp.x = tileWidth * newHead.x;
+		newHeadBmp.y = tileHeight * newHead.y;
+		segments.unshift(newHeadBmp);
+		addChild(segments[0]);
+	}
+	
+	/**
+	 * Returns the snake's segments positions.
+	 */
+	public function getPositions():Array<Point>
+	{
+		return segmentPositions;
+	}
+	
+	public function destroy():Void
+	{
+		
 	}
 }
 

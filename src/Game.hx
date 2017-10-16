@@ -1,7 +1,8 @@
 package;
 
 import flash.display.Sprite;
-import gameStates.Gameplay;
+import state.Gameplay;
+import state.StateManager;
 
 /**
  * This class represents the game.
@@ -12,7 +13,7 @@ class Game extends Sprite
 	/**
 	 * Used to switch between GameStates.
 	 */
-	public static var stateManager(default, null):StateManager;
+	public static var stateManager(default, null):state.StateManager;
 	/**
 	 * The state where the gameplay happens.
 	 */
@@ -26,7 +27,7 @@ class Game extends Sprite
 	
 	private function init():Void
 	{
-		Game.stateManager = new StateManager(this);
+		Game.stateManager = new state.StateManager(this);
 		gameplay = new Gameplay("Gameplay");
 		Game.stateManager.add(gameplay, true);
 	}
